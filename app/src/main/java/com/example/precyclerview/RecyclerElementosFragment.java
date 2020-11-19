@@ -1,20 +1,18 @@
 package com.example.precyclerview;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RatingBar;
 
 import com.example.precyclerview.databinding.FragmentRecyclerElementosBinding;
 import com.example.precyclerview.databinding.ViewholderElementoBinding;
@@ -38,18 +36,17 @@ public class RecyclerElementosFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         elementosViewModel = new ViewModelProvider(requireActivity()).get(ElementosViewModel.class);
+        navController = Navigation.findNavController(view);
 
         ElementosAdapter elementosAdapter = new ElementosAdapter();
         binding.recyclerView.setAdapter(elementosAdapter);
 
 
+        binding.irANuevoElemento.setOnClickListener(v ->
+                navController.navigate(R.id.action_recyclerElementosFragment_to_nuevoElementoFragment));
 
-        elementosViewModel.obtener().observe(getViewLifecycleOwner(), new Observer<List<Elemento>>() {
-            @Override
-            public void onChanged(List<Elemento> elementos) {
-                elementosAdapter.establecerLista(elementos);
-            }
-        });
+        elementosViewModel.obtener().observe(getViewLifecycleOwner(), elementos -> elementosAdapter.establecerLista(elementos));
+
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.RIGHT  | ItemTouchHelper.LEFT) {
@@ -97,14 +94,12 @@ public class RecyclerElementosFragment extends Fragment {
             holder.binding.nombre.setText(elemento.nombre);
             holder.binding.valoracion.setRating(elemento.valoracion);
 
-            holder.binding.valoracion.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-                @Override
-                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                    if(fromUser) {
-                        elementosViewModel.actualizar(elemento, rating);
-                    }
+            holder.binding.valoracion.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+                if(fromUser) {
+                    elementosViewModel.actualizar(elemento, rating);
                 }
             });
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

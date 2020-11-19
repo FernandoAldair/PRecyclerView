@@ -11,7 +11,9 @@ import java.util.List;
 public class ElementosViewModel extends AndroidViewModel {
 
     ElementoRepositorio elementoRepositorio;
+
     MutableLiveData<List<Elemento>> listMutableLiveData = new MutableLiveData<>();
+    MutableLiveData<Elemento> elementoSeleccionado = new MutableLiveData<>();
 
     public ElementosViewModel(@NonNull Application application) {
         super(application);
@@ -24,9 +26,9 @@ public class ElementosViewModel extends AndroidViewModel {
     MutableLiveData<List<Elemento>> obtener(){
         return listMutableLiveData;
     }
-    MutableLiveData<Elemento> elementoSeleccionado = new MutableLiveData<>();
 
-    void insert(Elemento elemento){
+
+    void insertar(Elemento elemento){
         elementoRepositorio.insertar(elemento, new ElementoRepositorio.Callback() {
             @Override
             public void cuandoFinalice(List<Elemento> elementos) {
